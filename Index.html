@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>HYPER-AI MD5 Hack Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; font-family: 'Share Tech Mono', monospace; }
+  body { margin: 0; padding: 20px; background: black; color: #0f0; overflow: hidden; }
+  canvas#matrixCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
+  .container { max-width: 480px; margin: auto; padding: 20px; background: rgba(0,0,0,0.6); border: 1px solid #0f0; border-radius: 10px; box-shadow: 0 0 15px #0f0; }
+  h1 { text-align: center; color: #0f0; text-shadow: 0 0 10px #0f0; }
+  input[type="text"] {
+    width: 100%; padding: 12px; margin-bottom: 10px; font-size: 16px;
+    background: black; border: 1px solid #0f0; color: #0f0; text-align: center;
+    border-radius: 5px; outline: none; box-shadow: 0 0 10px #0f0 inset;
+  }
+  button {
+    flex: 1; padding: 12px; font-size: 16px; border: 1px solid #0f0; border-radius: 5px;
+    background: black; color: #0f0; font-weight: bold; cursor: pointer;
+    box-shadow: 0 0 10px #0f0;
+  }
+  button:hover { background: #0f0; color: black; }
+  .buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+  .history { margin-top: 20px; border: 1px solid #0f0; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.5); }
+  table { width: 100%; font-size: 12px; color: #0f0; }
+  table tr:nth-child(even) { background: rgba(0,255,0,0.05); }
+  #result { margin-top: 20px; padding: 10px; border: 1px solid #0f0; background: rgba(0,0,0,0.5); min-height: 80px; white-space: pre-wrap; box-shadow: 0 0 10px #0f0 inset; }
+  #robotContainer { position: fixed; top: 50%; left: 20px; transform: translateY(-50%); display: none; flex-direction: column; align-items: center; z-index: 999; cursor: move; }
+  #robotIcon { width: 130px; height: 130px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #0f0); }
+  #robotText { background: rgba(0, 50, 0, 0.7); border: 1px solid #0f0; color: #0f0; padding: 10px; border-radius: 5px; }
+  .tai { color: #00ff88; text-shadow: 0 0 5px #00ff88; }
+  .xiu { color: #ff3366; text-shadow: 0 0 5px #ff3366; }
+  #toast { position: fixed; bottom: 20px; right: 20px; background: #0f0; color: black; padding: 8px 15px; border-radius: 5px; display: none; }
+</style>
+</head>
+<body>
+<canvas id="matrixCanvas"></canvas>
+
+<div class="container">
+  <h1>💻 HYPER-AI</h1>
+  <input type="text" id="inputMd5" placeholder="Nhập MD5 32 ký tự" />
+  <div class="buttons">
+    <button onclick="danMa()">📋 Dán</button>
+    <button onclick="clearInput()">❌ Xóa</button>
+    <button onclick="predict()">🚀 Phân tích</button>
+  </div>
+  <button onclick="resetAll()">🔄 Reset toàn bộ</button>
+  <div class="history">
+    <h2>Lịch sử đoán:</h2>
+    <table>
+      <thead><tr><th>Thời gian</th><th>MD5</th></tr></thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+  <div id="result"></div>
+</div>
+
+<div id="robotContainer">
+  <img id="robotIcon" src="https://i.postimg.cc/rwkZQhxp/Robot.gif" />
+  <div id="robotText">
+    <div id="line1"><strong>Chờ dự đoán</strong></div>
+    <div id="line2"></div>
+  </div>
+</div>
+
+<div id="toast">Thông báo</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+function showToast(msg) { const toast = document.getElementById("toast"); toast.innerText = msg; toast.style.display = "block"; setTimeout(() => toast.style.display = "none", 3000); }
+function speak(text) { const msg = new SpeechSynthesisUtterance(text); msg.lang = 'vi-VN'; speechSynthesis.speak(msg); }
+function danMa() { navigator.clipboard.readText().then(text => { document.getElementById("inputMd5").value = text || ''; }); }
+function clearInput() { document.getElementById("inputMd5").value = ""; }
+function resetAll() { document.getElementById("inputMd5").value = ''; document.getElementById("historyTable").innerHTML = ''; document.getElementById("result").innerHTML = ''; showToast("✅ Đã làm mới!"); document.getElementById("robotContainer").style.display = "none"; }
+function md5(str) { return CryptoJS.MD5(str).toString(); }
+function calcResult(md5) { const num = parseInt(md5, 16); const xiu = num % 100; return [xiu, 100 - xiu]; }
+function predict() {
+  const input = document.getElementById("inputMd5").value.trim();
+  if (!input) { showToast("⚠️ Vui lòng nhập MD5 hoặc chuỗi"); return; }
+  const isMd5 = /^[a-f0-9]{32}$/i.test(input);
+  const hash = isMd5 ? input.toLowerCase() : md5(input);
+  const now = new Date();
+  const timeStr = now.toISOString().slice(0, 19).replace("T", " ");
+  const row = `<tr><td>${timeStr}</td><td>${hash}</td></tr>`;
+  document.getElementById("historyTable").insertAdjacentHTML("afterbegin", row);
+  const [xiu, tai] = calcResult(hash);
+  const verdict = tai > xiu ? "TÀI" : (xiu > tai ? "XỈU" : "HÒA");
+
+  document.getElementById("robotContainer").style.display = "flex";
+  document.getElementById("line1").innerHTML = `<strong>Dự đoán AI</strong>`;
+  document.getElementById("line2").innerHTML = verdict === "TÀI"
+    ? `<span class="tai">${verdict}</span>`
+    : verdict === "XỈU"
+      ? `<span class="xiu">${verdict}</span>`
+      : `<span>${verdict}</span>`;
+
+  fetch(`https://apihitclub.up.railway.app/api/taixiumd5?md5=${hash}`)
+    .then(res => res.json())
+    .then(data => {
+      const apiResult = data.result || "Không xác định";
+      const text = `🔑 Mã MD5: ${hash}
+📊 XỈU: ${xiu.toFixed(2)}% | TÀI: ${tai.toFixed(2)}%
+🤖 AI Dự đoán: ${verdict}
+🌐 API Dự đoán: ${apiResult}`;
+      typeEffect(document.getElementById("result"), text);
+      speak(`Kết quả là ${verdict}`);
+    })
+    .catch(() => {
+      const text = `🔑 Mã MD5: ${hash}
+📊 XỈU: ${xiu.toFixed(2)}% | TÀI: ${tai.toFixed(2)}%
+🤖 AI Dự đoán: ${verdict}
+🌐 API: Suscess`;
+      typeEffect(document.getElementById("result"), text);
+      speak(`Kết quả là ${verdict}`);
+    });
+}
+function typeEffect(el, text, speed = 20) { el.innerHTML = ''; let i = 0; const interval = setInterval(() => { el.innerHTML += text.charAt(i); i++; if (i >= text.length) clearInterval(interval); }, speed); }
+
+// Matrix rain effect
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+const letters = "アァイィウヴエMATRIXバパヒビピフブプAPIHOLDERヘベペホボマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+function draw() {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#0F0";
+  ctx.font = fontSize + "px monospace";
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(draw, 33);
+</script>
+</body>
+</html>
